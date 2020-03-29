@@ -1,5 +1,6 @@
 package com.gustavopereira.cursomc;
 
+import java.text.SimpleDateFormat;
 import java.util.Arrays;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -12,35 +13,48 @@ import com.gustavopereira.cursomc.domain.Cidade;
 import com.gustavopereira.cursomc.domain.Cliente;
 import com.gustavopereira.cursomc.domain.Endereco;
 import com.gustavopereira.cursomc.domain.Estado;
+import com.gustavopereira.cursomc.domain.Pagamento;
+import com.gustavopereira.cursomc.domain.PagamentoComBoleto;
+import com.gustavopereira.cursomc.domain.PagamentoComCartao;
+import com.gustavopereira.cursomc.domain.Pedido;
 import com.gustavopereira.cursomc.domain.Produto;
+import com.gustavopereira.cursomc.domain.enums.EstadoPagamento;
 import com.gustavopereira.cursomc.domain.enums.TipoCliente;
 import com.gustavopereira.cursomc.repositories.CategoriaRepository;
 import com.gustavopereira.cursomc.repositories.CidadeRepository;
 import com.gustavopereira.cursomc.repositories.ClienteRepository;
 import com.gustavopereira.cursomc.repositories.EnderecoRepository;
 import com.gustavopereira.cursomc.repositories.EstadoRepository;
+import com.gustavopereira.cursomc.repositories.PagamentoRepository;
+import com.gustavopereira.cursomc.repositories.PedidoRepository;
 import com.gustavopereira.cursomc.repositories.ProdutoRepository;
 
 @SpringBootApplication
 public class CursomcApplication implements CommandLineRunner {
 
 	@Autowired
-	private CategoriaRepository categoria;
+	private CategoriaRepository categoriaRepository;
 	
 	@Autowired
-	private ProdutoRepository prodRepo;
+	private ProdutoRepository produtoRepository;
 	
 	@Autowired
-	private EstadoRepository estado;
+	private EstadoRepository estadoRepository;
 	
 	@Autowired
-	private CidadeRepository cidade;
+	private CidadeRepository cidadeRepository;
 	
 	@Autowired
-	private ClienteRepository cliente;
+	private ClienteRepository clienteRepository;
 	
 	@Autowired
-	EnderecoRepository endereco;
+	EnderecoRepository enderecoRepository;
+	
+	@Autowired
+	private PedidoRepository pedidoRepository;
+	
+	@Autowired
+	private PagamentoRepository pagamentoRepository;
 	
 	public static void main(String[] args) {
 		SpringApplication.run(CursomcApplication.class, args);
@@ -63,8 +77,8 @@ public class CursomcApplication implements CommandLineRunner {
 		prod3.getCategorias().addAll(Arrays.asList(cat1));	
 		
 				
-		categoria.saveAll(Arrays.asList(cat1, cat2));
-		prodRepo.saveAll(Arrays.asList(prod1, prod2, prod3));
+		categoriaRepository.saveAll(Arrays.asList(cat1, cat2));
+		produtoRepository.saveAll(Arrays.asList(prod1, prod2, prod3));
 		
 		Estado est1 = new Estado(null, "Minas Gerais");
 		Estado est2 = new Estado(null, "Sao Paulo");
@@ -76,8 +90,8 @@ public class CursomcApplication implements CommandLineRunner {
 		est1.getCidades().addAll(Arrays.asList(cd1));
 		est2.getCidades().addAll(Arrays.asList(cd2, cd3));
 		
-		estado.saveAll(Arrays.asList(est1, est2));
-		cidade.saveAll(Arrays.asList(cd1, cd2, cd3));
+		estadoRepository.saveAll(Arrays.asList(est1, est2));
+		cidadeRepository.saveAll(Arrays.asList(cd1, cd2, cd3));
 		
 		Cliente cli1 = new Cliente(null, "Maria Silva", "maria@gmail.com", "04937959603", TipoCliente.PESSOAFISICA);
 		cli1.getTelefones().addAll(Arrays.asList("3332256560", "33999797225"));
@@ -87,8 +101,24 @@ public class CursomcApplication implements CommandLineRunner {
 		
 		cli1.getEnderecos().addAll(Arrays.asList(e1,e2));
 		
-		cliente.save(cli1);
-		endereco.saveAll(Arrays.asList(e1, e2));
+		clienteRepository.save(cli1);
+		enderecoRepository.saveAll(Arrays.asList(e1, e2));
+		
+		SimpleDateFormat sdf = new SimpleDateFormat("dd/MM/yyyy HH:mm"); 
+		
+		Pedido ped1 = new Pedido(null, sdf.parse("30/09/2019 10:32"), cli1, e1);
+		Pedido ped2 = new Pedido(null, sdf.parse("10/10/2019 10:32"), cli1, e2);
+		
+		Pagamento pagto1 = new PagamentoComCartao(null, EstadoPagamento.QUITADO, ped1, 6);
+		ped1.setPagamento(pagto1);
+		
+		Pagamento pagto2 = new PagamentoComBoleto(null, EstadoPagamento.PENDENTE, ped2, sdf.parse("20/10/2017 00:00"), null);
+		ped2.setPagamento(pagto2);
+		
+		cli1.getPedidos().addAll(Arrays.asList(ped1, ped2));
+		
+		pedidoRepository.saveAll(Arrays.asList(ped1, ped2));
+		pagamentoRepository.saveAll(Arrays.asList(pagto1, pagto2));
 		
 	}
 
