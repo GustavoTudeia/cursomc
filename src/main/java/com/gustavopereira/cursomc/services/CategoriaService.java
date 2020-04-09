@@ -11,6 +11,7 @@ import org.springframework.data.domain.Sort.Direction;
 import org.springframework.stereotype.Service;
 
 import com.gustavopereira.cursomc.domain.Categoria;
+import com.gustavopereira.cursomc.dto.CategoriaDTO;
 import com.gustavopereira.cursomc.repositories.CategoriaRepository;
 import com.gustavopereira.cursomc.services.exceptions.DataIntegrityException;
 import com.gustavopereira.cursomc.services.exceptions.ObjectNotFoundException;
@@ -42,7 +43,7 @@ public class CategoriaService {
 		try {
 			repo.deleteById(id);
 		} catch (DataIntegrityViolationException e) {
-			throw new DataIntegrityException("Não possível excluir categoria com produto");
+			throw new DataIntegrityException("Não possível excluir categoria com produto", e.getCause());
 		}
 	}
 
@@ -54,6 +55,10 @@ public class CategoriaService {
 		PageRequest pageResquest = PageRequest.of(page, size, direction, properties);
 		return repo.findAll(pageResquest);
 		
+	}
+	
+	public Categoria fromDTO(CategoriaDTO dto) {
+		return new Categoria(dto.getId(), dto.getNome());
 	}
 	
 }
