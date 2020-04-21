@@ -89,10 +89,6 @@ public class Cliente implements Serializable{
 		return TipoCliente.toEnum(tipoCliente);
 	}
 
-	public void setTipoCliente(TipoCliente tipoCliente) {
-		this.tipoCliente = tipoCliente.getCod();
-	}
-
 	public List<Endereco> getEnderecos() {
 		return enderecos;
 	}

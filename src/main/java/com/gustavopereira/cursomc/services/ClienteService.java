@@ -9,11 +9,13 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort.Direction;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import com.gustavopereira.cursomc.domain.Cliente;
 import com.gustavopereira.cursomc.domain.enums.TipoCliente;
 import com.gustavopereira.cursomc.dto.ClienteDTO;
 import com.gustavopereira.cursomc.repositories.ClienteRepository;
+import com.gustavopereira.cursomc.repositories.EnderecoRepository;
 import com.gustavopereira.cursomc.services.exceptions.DataIntegrityException;
 import com.gustavopereira.cursomc.services.exceptions.ObjectNotFoundException;
 
@@ -22,6 +24,9 @@ public class ClienteService {
 	
 	@Autowired
 	private ClienteRepository repo;
+	
+	@Autowired
+	private EnderecoRepository repoEnd;
 
 	public Cliente find(Integer id) {
 		Optional<Cliente> categoria = repo.findById(id);
@@ -29,8 +34,19 @@ public class ClienteService {
 	}
 	
 
-	public Cliente insert(Cliente fromDTO) {
-		throw new UnsupportedOperationException();
+	@Transactional
+	public Cliente insert(Cliente cliente) {
+		cliente = repo.save(cliente);
+		
+		if(cliente.getEnderecos() != null && cliente.getEnderecos().size() > 0) {
+			for(int x = 0; x < cliente.getEnderecos().size(); x++) {
+				cliente.getEnderecos().get(x).setCliente(cliente);
+			}
+			
+			repoEnd.saveAll(cliente.getEnderecos());
+		}
+		
+		return cliente;
 	}
 
 	public Cliente update(Cliente obj) {
@@ -51,7 +67,7 @@ public class ClienteService {
 		}
 		
 		if(obj.getTipoCliente() != null) {
-			newObj.setTipoCliente(obj.getTipoCliente());
+			newObj.setTipoCliente(obj.getTipoCliente().getCod());
 		}
 	}
 
