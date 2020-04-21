@@ -77,7 +77,7 @@ public class ClienteService {
 		try {
 			repo.deleteById(id);
 		}catch (DataIntegrityViolationException e) {
-			throw new DataIntegrityException("Não possível excluir cliente com pedido(s) ou endereco(s) associado(s)! ", e.getCause());
+			throw new DataIntegrityException("Não possível excluir cliente com pedido(s) associado(s)! ", e.getCause());
 		}
 		
 	}
