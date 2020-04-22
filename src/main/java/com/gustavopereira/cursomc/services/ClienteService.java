@@ -12,6 +12,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import com.gustavopereira.cursomc.domain.Cliente;
+import com.gustavopereira.cursomc.domain.Endereco;
 import com.gustavopereira.cursomc.domain.enums.TipoCliente;
 import com.gustavopereira.cursomc.dto.ClienteDTO;
 import com.gustavopereira.cursomc.repositories.ClienteRepository;
@@ -38,15 +39,27 @@ public class ClienteService {
 	public Cliente insert(Cliente cliente) {
 		cliente = repo.save(cliente);
 		
+		List<Endereco> enderecos = associaCliente(cliente);
+		if(enderecos != null && enderecos.size() > 0) {
+			repoEnd.saveAll(enderecos);
+		}
+		
+		return cliente;
+	}
+
+
+	private List<Endereco> associaCliente(Cliente cliente) {
+		List<Endereco> enderecos = null;
 		if(cliente.getEnderecos() != null && cliente.getEnderecos().size() > 0) {
 			for(int x = 0; x < cliente.getEnderecos().size(); x++) {
 				cliente.getEnderecos().get(x).setCliente(cliente);
 			}
 			
-			repoEnd.saveAll(cliente.getEnderecos());
+			enderecos =  cliente.getEnderecos();
 		}
 		
-		return cliente;
+		return enderecos;
+		
 	}
 
 	public Cliente update(Cliente obj) {
@@ -68,6 +81,11 @@ public class ClienteService {
 		
 		if(obj.getTipoCliente() != null) {
 			newObj.setTipoCliente(obj.getTipoCliente().getCod());
+		}
+		
+		List<Endereco> enderecos = associaCliente(obj);
+		if(enderecos != null && enderecos.size() > 0) {
+			newObj.setEnderecos(enderecos);
 		}
 	}
 
