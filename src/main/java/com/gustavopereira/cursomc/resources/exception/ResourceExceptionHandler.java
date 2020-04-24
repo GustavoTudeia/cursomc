@@ -2,6 +2,7 @@ package com.gustavopereira.cursomc.resources.exception;
 
 import javax.servlet.http.HttpServletRequest;
 
+import org.springframework.dao.InvalidDataAccessApiUsageException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.FieldError;
@@ -35,5 +36,11 @@ public class ResourceExceptionHandler {
 			err.addError(f.getField(), f.getDefaultMessage());
 		}
 		return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(err);
+	}
+	
+	@ExceptionHandler(InvalidDataAccessApiUsageException.class)
+	public ResponseEntity<StandardError> argumentIlegal(InvalidDataAccessApiUsageException e, HttpServletRequest request){
+		StandardError err = new StandardError(HttpStatus.INTERNAL_SERVER_ERROR.value(), e.getMessage(), System.currentTimeMillis(), e.getCause().toString());
+		return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(err);
 	}
 }
