@@ -65,6 +65,16 @@ public class Pedido implements Serializable{
 		this.pagamento = pagamento;
 	}
 	
+	public Double getValorTotalPedido() {
+		Double soma = 0.0;
+		
+		for(ItemPedido ip : items) {
+			soma += ip.getSubTotal();
+		}
+		
+		return soma;
+	}
+	
 	public List<Produto> getProdutos(){
 		List<Produto> lista = new ArrayList<Produto>();
 		
